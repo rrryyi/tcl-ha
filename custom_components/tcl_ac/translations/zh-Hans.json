@@ -1,0 +1,120 @@
+{
+    "config": {
+        "error": {
+            "auth_error": "认证失败",
+            "sms_error": "短信发送失败"
+        },
+        "step": {
+            "user": {
+                "title": "选择登录方式",
+                "data": {
+                    "login_method": "登录方式"
+                }
+            },
+            "token": {
+                "title": "Token 登录",
+                "data": {
+                    "account_id": "Account Id",
+                    "refresh_token": "Refresh Token",
+                    "default_load_all_entity": "默认加载所有实体"
+                }
+            },
+            "password": {
+                "title": "密码登录",
+                "data": {
+                    "phone": "手机号",
+                    "password": "密码",
+                    "default_load_all_entity": "默认加载所有实体"
+                }
+            },
+            "sms_phone": {
+                "title": "短信验证码登录",
+                "description": "输入手机号发送验证码",
+                "data": {
+                    "phone": "手机号",
+                    "default_load_all_entity": "默认加载所有实体"
+                }
+            },
+            "sms_code": {
+                "title": "输入验证码",
+                "data": {
+                    "code": "验证码"
+                }
+            }
+        }
+    },
+    "options": {
+        "error": {
+            "auth_error": "认证失败",
+            "sms_error": "短信发送失败"
+        },
+        "step": {
+            "init": {
+                "menu_options": {
+                    "account": "更新账户",
+                    "device": "设备筛选",
+                    "entity_device_selector": "实体筛选"
+                }
+            },
+            "account": {
+                "title": "选择登录方式",
+                "data": {
+                    "login_method": "登录方式"
+                }
+            },
+            "account_token": {
+                "title": "Token 登录",
+                "data": {
+                    "account_id": "Account Id",
+                    "refresh_token": "Refresh Token",
+                    "default_load_all_entity": "默认加载所有实体"
+                }
+            },
+            "account_password": {
+                "title": "密码登录",
+                "data": {
+                    "phone": "手机号",
+                    "password": "密码",
+                    "default_load_all_entity": "默认加载所有实体"
+                }
+            },
+            "account_sms_phone": {
+                "title": "短信验证码登录",
+                "description": "输入手机号发送验证码",
+                "data": {
+                    "phone": "手机号"
+                }
+            },
+            "account_sms_code": {
+                "title": "输入验证码",
+                "data": {
+                    "code": "验证码"
+                }
+            },
+            "device": {
+                "title": "设备筛选",
+                "description": "筛选方式为Exclude时，设备列表中已勾选的设备将不会接入；筛选方式为Include时则只接入设备列表中已勾选的设备",
+                "data": {
+                    "filter_type": "筛选方式",
+                    "target_devices": "设备列表"
+                }
+            },
+            "entity_device_selector": {
+                "title": "设备选择",
+                "description": "请选择需要操作的设备",
+                "data": {
+                    "target_device": "目标设备"
+                }
+            },
+            "entity_filter": {
+                "title": "实体筛选",
+                "description": "筛选方式为Exclude时，实体列表中已勾选的实体将不会接入；筛选方式为Include时则只接入实体列表中已勾选的实体",
+                "data": {
+                    "device_id": "目标设备（请勿修改）",
+                    "filter_type": "筛选方式",
+                    "target_entities": "实体列表"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,120 @@
+{
+    "config": {
+        "error": {
+            "auth_error": "Authentication failed",
+            "sms_error": "SMS sending failed"
+        },
+        "step": {
+            "user": {
+                "title": "Select Login Method",
+                "data": {
+                    "login_method": "Login Method"
+                }
+            },
+            "token": {
+                "title": "Token Login",
+                "data": {
+                    "account_id": "Account Id",
+                    "refresh_token": "Refresh Token",
+                    "default_load_all_entity": "Default load all entity"
+                }
+            },
+            "password": {
+                "title": "Password Login",
+                "data": {
+                    "phone": "Phone Number",
+                    "password": "Password",
+                    "default_load_all_entity": "Default load all entity"
+                }
+            },
+            "sms_phone": {
+                "title": "SMS Login",
+                "description": "Enter your phone number to receive a verification code",
+                "data": {
+                    "phone": "Phone Number",
+                    "default_load_all_entity": "Default load all entity"
+                }
+            },
+            "sms_code": {
+                "title": "Enter Verification Code",
+                "data": {
+                    "code": "Verification Code"
+                }
+            }
+        }
+    },
+    "options": {
+        "error": {
+            "auth_error": "Authentication failed",
+            "sms_error": "SMS sending failed"
+        },
+        "step": {
+            "init": {
+                "menu_options": {
+                    "account": "Update account",
+                    "device": "Device Filter",
+                    "entity_device_selector": "Entity Filter"
+                }
+            },
+            "account": {
+                "title": "Select Login Method",
+                "data": {
+                    "login_method": "Login Method"
+                }
+            },
+            "account_token": {
+                "title": "Token Login",
+                "data": {
+                    "account_id": "Account Id",
+                    "refresh_token": "Refresh Token",
+                    "default_load_all_entity": "Default load all entity"
+                }
+            },
+            "account_password": {
+                "title": "Password Login",
+                "data": {
+                    "phone": "Phone Number",
+                    "password": "Password",
+                    "default_load_all_entity": "Default load all entity"
+                }
+            },
+            "account_sms_phone": {
+                "title": "SMS Login",
+                "description": "Enter your phone number to receive a verification code",
+                "data": {
+                    "phone": "Phone Number"
+                }
+            },
+            "account_sms_code": {
+                "title": "Enter Verification Code",
+                "data": {
+                    "code": "Verification Code"
+                }
+            },
+            "device": {
+                "title": "Device Filter",
+                "description": "Exclude: checked devices will not be loaded. Include: only checked devices will be loaded.",
+                "data": {
+                    "filter_type": "Filter method",
+                    "target_devices": "Device List"
+                }
+            },
+            "entity_device_selector": {
+                "title": "Select Device",
+                "description": "Please select the device to be operated",
+                "data": {
+                    "target_device": "Target Device"
+                }
+            },
+            "entity_filter": {
+                "title": "Entity Filter",
+                "description": "Exclude: checked entities will not be loaded. Include: only checked entities will be loaded.",
+                "data": {
+                    "device_id": "Target device (do not modify)",
+                    "filter_type": "Filter method",
+                    "target_entities": "Entities"
+                }
+            }
+        }
+    }
+}
