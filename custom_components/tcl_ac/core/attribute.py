@@ -23,6 +23,29 @@ READONLY_SENSOR_KEYS = {
     'tslQueryTime',
     'currentTemperature',
     'roomTemperature',
+    # 上报型枚举（值由设备上报，不可下发）
+    'sensorTVOCLevel',
+    'airQuality',
+    'sleepState',
+    'remoteControlKey',
+    'InDoorRunMode',
+    'OutDoorRunMode',
+    'internalUnitFanCurrentGear',
+    # 上报型数值（外机目标/运行值、环境量等）
+    'OutDoorFanTarSpeed',
+    'OutDoorEEVTarOpenDegree',
+    'OutDoorCompTarFreqSet',
+    'OutDoorCompTarFreqRun',
+    'ambientLight',
+    'newWindAirChangeRate',
+    'sensorTVOCValue',
+    'selfCleanPercentage',
+    # "普通空调设备运行状态"组的开关型上报
+    'examineMode',
+    'storesMode',
+    # 新风模块的自动动作状态（specs 为"未进入防凝露/防凝露中"式描述，不接受下发）
+    'newWindAntiCondensation',
+    'newWindDeodorize',
     # 以下为空调诊断类只读属性（数值/枚举都应作为传感器展示，不能作为可写 Number/Select）
     'internalUnitCoilTemperature',
     'externalUnitCoilTemperature',
@@ -54,6 +77,11 @@ SENSOR_UNIT_BY_KEY = {
     'compressorFrequency': 'Hz',
     'externalUnitElectricCurrent': 'A',
     'externalUnitVoltage': 'V',
+    # 物模型的单位字段不可信（如目标值都写成"次"），这里给出正确单位
+    'OutDoorFanTarSpeed': 'rpm',
+    'OutDoorEEVTarOpenDegree': 'P',
+    'OutDoorCompTarFreqSet': 'Hz',
+    'OutDoorCompTarFreqRun': 'Hz',
 }
 
 # bool 类型的只读状态位默认按此表翻译
@@ -151,7 +179,8 @@ class V1SpecAttributeParser(TclAttributeParser, ABC):
             }
             ext['value_comparison_table'] = value_comparison_table
         elif 'int' in data_type or 'double' in data_type or 'float' in data_type:
-            unit = specs.get('unit') or SENSOR_UNIT_BY_KEY.get(attribute['identifier'])
+            # 已知诊断属性的单位表优先（物模型 specs 的单位可能不规范，如 Hz 写成 z）
+            unit = SENSOR_UNIT_BY_KEY.get(attribute['identifier']) or specs.get('unit')
             options['native_unit_of_measurement'] = unit
             if attribute['identifier'] in TEMPERATURE_SENSOR_KEYS:
                 options['device_class'] = SensorDeviceClass.TEMPERATURE

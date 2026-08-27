@@ -24,6 +24,7 @@ ATTR_NAME = {
     "newWindPercentage": "新风风速",
     "newWindAutoSwitch": "新风风速自动",
     "newWindSwitch": "新风开关",
+    "newWindSuper": "新风超强风",
     "sensorTVOCLevel": "TVOC质量等级",
     "healthy": "健康模式",
     "selfLearn": "自学习",
@@ -53,6 +54,25 @@ ATTR_NAME = {
     "errorCode": "故障码",
     "aiSmartControlSource": "AI控制来源",
     "airQuality": "空气质量",
+    # 上报型枚举的友好名（物模型 title 多为"普通空调设备运行状态"，无法区分）
+    "sensorTVOCLevel": "TVOC质量等级",
+    "sleepState": "睡眠状态",
+    "remoteControlKey": "遥控器按键",
+    "InDoorRunMode": "内机运行模式",
+    "OutDoorRunMode": "外机运行模式",
+    "internalUnitFanCurrentGear": "内机当前风档",
+    "AIECOStatus": "AI节能运行状态",
+    "regularReporting": "属性上报策略",
+    # 上报型数值的友好名（物模型 title 错标为"AI节能"/"新风"等，无法区分）
+    "OutDoorFanTarSpeed": "外机风机目标转速",
+    "OutDoorEEVTarOpenDegree": "电子膨胀阀目标开度",
+    "OutDoorCompTarFreqSet": "压缩机目标频率",
+    "OutDoorCompTarFreqRun": "压缩机运行频率",
+    "ambientLight": "环境光照度",
+    "newWindAirChangeRate": "新风换气量",
+    "sensorTVOCValue": "TVOC浓度",
+    "selfCleanPercentage": "蒸发器清洁进度",
+    "examineMode": "体检模式",
     # 卖场演示模式（门店样机用），家用保持关闭
     "storesMode": "卖场模式",
 }

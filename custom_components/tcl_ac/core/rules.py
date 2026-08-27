@@ -78,6 +78,8 @@ LINK_RULES = [
     {"main": ("ECO", "==", 1), "when": [], "actions": [{"PTC": 0}]},
     {"main": ("PTC", "==", 1), "when": [], "actions": [{"ECO": 0}]},
     {"main": ("selfClean", "==", 1), "when": [], "actions": [{"powerSwitch": 0}]},
+    # 新风超强风开启时，把新风风速拉满到 100（与 App 面板一致）
+    {"main": ("newWindSuper", "==", 1), "when": [], "actions": [{"newWindPercentage": 100}]},
 ]
 
 

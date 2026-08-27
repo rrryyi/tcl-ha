@@ -113,8 +113,6 @@ class TclDevice:
                         self.id, item.get('name', item.get('identifier', 'unknown'))
                     )
 
-            self._dedupe_display_names()
-
             # 快照 = user_devices 内联值 + thing/status 接口结果（后者存在时覆盖同名键）
             snapshot_data = dict(self._inline_property_values())
             status_data = await self._client.get_device_snapshot_data(self.id)
@@ -126,6 +124,22 @@ class TclDevice:
                 json.dumps(snapshot_data)
             )
             self._attribute_snapshot_data = snapshot_data
+
+            # 物模型是按产品系列定义的，可能包含本机型实际不上报的属性（如 ambientLight）。
+            # 以初始快照（内联 identifiers ∪ thing/status）为准过滤，
+            # 与 TCL App 只显示实际会上报的属性一致，避免产生永远"未知"的实体。
+            reported_keys = set(snapshot_data.keys())
+            if reported_keys:
+                kept = [a for a in self._attributes if a.key in reported_keys]
+                dropped = [a.key for a in self._attributes if a.key not in reported_keys]
+                if dropped:
+                    _LOGGER.info(
+                        'Device %s dropped %d attributes not reported by device: %s',
+                        self.id, len(dropped), ', '.join(sorted(dropped))
+                    )
+                    self._attributes = kept
+
+            self._dedupe_display_names()
         except Exception:
             _LOGGER.exception('Tcl device %s init failed', self.id)
 
