@@ -350,11 +350,21 @@ class TclClient:
         timestamp = str(int(time.time() * 1000))
         CLIENT_ID = f"{USER_ID}@miniprogram@{random_str}{timestamp}"
 
-        # 创建MQTT客户端
-        client = mqtt.Client(client_id=CLIENT_ID,
-                             clean_session=True,
-                             protocol=mqtt.MQTTv311,
-                             transport="websockets")
+        # 创建MQTT客户端（兼容 paho-mqtt 1.x 与 2.x：
+        # 2.x 的 Client() 要求 callback_api_version 参数，传入 VERSION1 保持旧回调签名）
+        try:
+            client = mqtt.Client(
+                callback_api_version=mqtt.CallbackAPIVersion.VERSION1,
+                client_id=CLIENT_ID,
+                clean_session=True,
+                protocol=mqtt.MQTTv311,
+                transport="websockets",
+            )
+        except (AttributeError, TypeError):
+            client = mqtt.Client(client_id=CLIENT_ID,
+                                 clean_session=True,
+                                 protocol=mqtt.MQTTv311,
+                                 transport="websockets")
 
         # 设置认证信息
         client.username_pw_set(username=USER_ID, password=ACCESS_TOKEN)

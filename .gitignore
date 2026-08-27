@@ -5,3 +5,4 @@ custom_components/*/session
 # 逆向分析相关 (不提交)
 tcl逆向/
 逆向成果/
+*.zip
