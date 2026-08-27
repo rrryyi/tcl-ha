@@ -93,11 +93,14 @@ class TclAbstractEntity(Entity, ABC):
         # 监听数据变化事件
         def data_callback(event):
             if event.data['deviceId'] == self._device.id:
-                self._attributes_data = event.data['attributes']
-                device_data = self._device.attribute_snapshot_data
+                # 增量合并进设备累计快照，实体始终读快照全量。
+                # 不能用增量直接替换 _attributes_data，否则任何一条推送
+                # 都会把不在增量里的属性顶掉（传感器被置回未知）。
+                device_data = dict(self._device.attribute_snapshot_data)
                 for key, value in event.data['attributes'].items():
                     device_data[str(key)] = value
                 self._device.update_attribute_snapshot_data(device_data)
+                self._attributes_data = device_data
             self._refresh_rule_state()
             self._update_value()
             self.schedule_update_ha_state()

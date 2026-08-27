@@ -19,6 +19,9 @@ _LOGGER = logging.getLogger(__name__)
 # token 剩余有效期低于该秒数时提前刷新，避免用到过期才失败
 TOKEN_REFRESH_MARGIN = 1800
 
+# 设备属性轮询间隔（秒），对齐 tclplus-ac
+PROPS_POLL_INTERVAL = 30
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data.setdefault(DOMAIN, {
@@ -43,6 +46,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     device_signal = threading.Event()
     hass.async_create_background_task(client.listen_devices(devices, device_signal), 'tcl-device-data')
     hass.data[DOMAIN]['signals'].append(device_signal)
+
+    # 周期轮询设备属性（App 通道 user_devices 内联值）：MQTT 只推增量、待机时几乎无推送，
+    # 轮询保证传感器有稳定数据来源（tclplus-ac 的做法）
+    poll_signal = threading.Event()
+    hass.async_create_background_task(device_props_poller(hass, client, poll_signal), 'tcl-props-poller')
+    hass.data[DOMAIN]['signals'].append(poll_signal)
     #轮训获取数据,已废弃
     # device_updater_signal = threading.Event()
     # hass.async_create_background_task(data_updater(hass,account_cfg,client,devices,device_updater_signal), 'tcl-device-data-updater')
@@ -75,6 +84,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 #                 })
 #         refresh_data_time if refresh_data_time > 1 else 1
 #         await asyncio.sleep(refresh_data_time*60)
+
+async def device_props_poller(hass: HomeAssistant, client: TclClient, signal: threading.Event):
+    """
+    每 30 秒拉取 App 通道 user_devices 的内联属性值，合并进设备快照并广播数据变化。
+    """
+    while not signal.is_set():
+        try:
+            props_by_device = await client.get_user_devices_props()
+            for device in hass.data[DOMAIN]['devices']:
+                props = props_by_device.get(device.id)
+                if not props:
+                    continue
+                device_data = dict(device.attribute_snapshot_data)
+                device_data.update(props)
+                device.update_attribute_snapshot_data(device_data)
+                fire_event(hass, EVENT_DEVICE_DATA_CHANGED, {
+                    'deviceId': device.id,
+                    'attributes': props
+                })
+        except TclClientException as e:
+            _LOGGER.warning('轮询设备属性失败: %s', e)
+        except Exception:
+            _LOGGER.exception('轮询设备属性异常')
+        await asyncio.sleep(PROPS_POLL_INTERVAL)
+
 
 async def token_updater(hass: HomeAssistant, entry: ConfigEntry, signal: threading.Event):
     """

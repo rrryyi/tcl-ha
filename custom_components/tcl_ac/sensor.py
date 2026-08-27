@@ -1,3 +1,4 @@
+import json
 import logging
 
 from homeassistant.components.sensor import SensorEntity
@@ -70,7 +71,13 @@ class TclSensor(TclAbstractEntity, SensorEntity):
         """处理结构体传感器"""
         try:
             values = self._attributes_data.get(self._attribute.key, {})
-            if not values:
+            if isinstance(values, str):
+                # 轮询/上报的 struct 值可能是 JSON 字符串
+                try:
+                    values = json.loads(values)
+                except ValueError:
+                    values = None
+            if not isinstance(values, dict) or not values:
                 self._attr_native_value = "No data"
                 self._attr_extra_state_attributes = {}
                 return

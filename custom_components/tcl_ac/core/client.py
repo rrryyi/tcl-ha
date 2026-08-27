@@ -47,6 +47,8 @@ QUICK_LOGIN_API = 'https://cn.account.tcl.com/auth/auth/quickLogin'
 SMS_CAPTCHA_API = 'https://cn.account.tcl.com/captcha/captcha/new/smsCaptcha'
 GET_USER_INFO_API = 'https://cn.account.tcl.com/user/user/getUserInfoByToken'
 GET_DEVICES_API = 'https://io.zx.tcljd.com/v1/tclplus/weChat/user/user_devices'
+# App 通道设备列表：每个设备内联 identifiers 列表携带全部属性当前值（tclplus-ac 的传感器数据源）
+APP_USER_DEVICES_API = 'https://io.zx.tcljd.com/v1/tclplus/user/user_devices'
 GET_MQTT_CONFIG_API = 'https://io.zx.tcljd.com/v1/auth/service/loadBalance'
 CONTROL_DEVICE_API = 'https://io.zx.tcljd.com/v1/control/property/{deviceId}'
 DEVICE_STATUS_API = 'https://io.zx.tcljd.com/v1/thing/status'
@@ -309,6 +311,54 @@ class TclClient:
         })
 
         return attributes
+
+    @staticmethod
+    def _extract_device_props(items) -> dict:
+        """从 user_devices 响应的设备列表提取 {deviceId: {identifier: value}}"""
+        result = {}
+        for raw in items or []:
+            if not isinstance(raw, dict) or not raw.get('deviceId'):
+                continue
+            props = {}
+            for item in raw.get('identifiers') or []:
+                if isinstance(item, dict) and item.get('identifier') is not None:
+                    props[str(item['identifier'])] = item.get('value')
+            result[str(raw['deviceId'])] = props
+        return result
+
+    async def get_user_devices_props(self) -> dict:
+        """
+        拉取设备属性当前值：返回 {deviceId: {identifier: value}}。
+        优先 App 通道 user_devices（tclplus-ac 验证过的数据源），失败退回微信小程序通道。
+        """
+        try:
+            api_headers = {
+                "platform": "android",
+                "User-Agent": "com.tcl.tclplus/6.0.4",
+                "appPackageName": "com.tcl.tclplus",
+                "systemVersion": "15",
+                "brand": "HomeAssistant",
+                "appVersion": "4.1.4",
+                "sdkVersion": "6.0.4",
+                "accessToken": self._token,
+            }
+            async with self._session.get(url=APP_USER_DEVICES_API, headers=api_headers) as response:
+                content = await response.json(content_type=None)
+                self._assert_response_successful(content)
+                data = content.get('data')
+                if isinstance(data, dict):
+                    items = data.get('list') or data.get('deviceList') or []
+                else:
+                    items = data or []
+                return self._extract_device_props(items)
+        except TclClientException:
+            _LOGGER.debug('App 通道 user_devices 不可用，退回微信小程序通道')
+
+        api_headers = self._get_io_headers()
+        async with self._session.get(url=GET_DEVICES_API, headers=api_headers) as response:
+            content = await response.json(content_type=None)
+            self._assert_response_successful(content)
+            return self._extract_device_props(content.get('data'))
 
     async def get_device_snapshot_data(self, deviceId: str) -> dict:
         """
