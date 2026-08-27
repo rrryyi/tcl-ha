@@ -58,6 +58,20 @@ class TclDevice:
         # 可以在这里添加数据验证逻辑
         self._attribute_snapshot_data = new_data
 
+    def _inline_property_values(self) -> dict:
+        """从 user_devices 响应内联的 identifiers 列表提取 {identifier: value}。
+        快照接口返回不完整时，这里是传感器初始值的主要来源。"""
+        values = {}
+        for item in self._raw_data.get('identifiers') or []:
+            if isinstance(item, dict) and item.get('identifier') is not None:
+                values[str(item['identifier'])] = item.get('value')
+        if values:
+            _LOGGER.info(
+                'Device %s got %d inline property values from user_devices',
+                self.id, len(values)
+            )
+        return values
+
     async def async_init(self):
         # 解析Attribute
         # noinspection PyBroadException
@@ -101,7 +115,11 @@ class TclDevice:
 
             self._dedupe_display_names()
 
-            snapshot_data = await self._client.get_device_snapshot_data(self.id)
+            # 快照 = user_devices 内联值 + thing/status 接口结果（后者存在时覆盖同名键）
+            snapshot_data = dict(self._inline_property_values())
+            status_data = await self._client.get_device_snapshot_data(self.id)
+            if isinstance(status_data, dict):
+                snapshot_data.update(status_data)
             _LOGGER.debug(
                 'device %s snapshot data fetch successful. data: %s',
                 self.id,

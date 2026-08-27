@@ -53,6 +53,8 @@ ATTR_NAME = {
     "errorCode": "故障码",
     "aiSmartControlSource": "AI控制来源",
     "airQuality": "空气质量",
+    # 卖场演示模式（门店样机用），家用保持关闭
+    "storesMode": "卖场模式",
 }
 
 def try_read_as_bool(value):

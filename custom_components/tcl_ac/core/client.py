@@ -328,7 +328,20 @@ class TclClient:
                     json.dumps(content, ensure_ascii=False)
                 ))
                 return {}
-            return content['data']['status']
+            status = content['data']['status']
+            # 兼容列表形态: [{identifier: ..., value: ...}] → {identifier: value}
+            if isinstance(status, list):
+                return {
+                    str(item['identifier']): item.get('value')
+                    for item in status
+                    if isinstance(item, dict) and 'identifier' in item
+                }
+            if not isinstance(status, dict):
+                _LOGGER.warning("Device {} snapshot status has unexpected shape: {}".format(
+                    deviceId, type(status).__name__
+                ))
+                return {}
+            return status
 
     async def listen_devices(self, targetDevices: List[TclDevice], signal: threading.Event):
         """
@@ -520,8 +533,19 @@ class TclClient:
         }
         async with session.post(url=api_url, headers=api_headers, json=api_body) as response:
             content = await response.json(content_type=None)
-            if 'traceId' in content and content['code'] != '200':
-                raise TclClientException('接口返回异常: ' + content['message'])
+            # 云端拒绝可能不带回 traceId，不能只依赖 traceId 判断成败
+            code = content.get('code')
+            if response.status != 200 or (code is not None and str(code) not in ('200', '0')):
+                _LOGGER.warning(
+                    "控制命令被云端拒绝: deviceId=%s, http=%s, params=%s, response=%s",
+                    deviceId, response.status, params,
+                    json.dumps(content, ensure_ascii=False)
+                )
+                raise TclClientException('接口返回异常: ' + str(content.get('message', content)))
+            _LOGGER.debug(
+                "控制命令已下发: deviceId=%s, params=%s, response=%s",
+                deviceId, params, json.dumps(content, ensure_ascii=False)
+            )
 
     # ============================================================
     # 登录方法 (iOS App 凭据 + RSA 加密)

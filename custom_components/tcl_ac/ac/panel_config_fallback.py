@@ -9,7 +9,7 @@ TCL 空调面板物模型 fallback 数据。
 
 PANEL_CONFIG_FALLBACK = {
     "1112017519N": [
-        {"function": "powerSwitch", "identifier": "powerSwitch", "title": "电源开关", "description": "", "type": "bool", "specs": {"0": "开机", "1": "关机"}, "uiComponent": "UISwitch"},
+        {"function": "powerSwitch", "identifier": "powerSwitch", "title": "电源开关", "description": "", "type": "bool", "specs": {"1": "开机", "0": "关机"}, "uiComponent": "UISwitch"},
         {"function": "targetTemperature", "identifier": "targetTemperature", "title": "温度", "description": "", "type": "int", "specs": {"min": 16, "max": 31, "step": 0.5, "unit": "℃"}, "uiComponent": "UISwitch"},
         {"function": "newWind", "identifier": "newWindSwitch", "title": "新风", "description": "", "type": "bool", "specs": {"0": "关", "1": "开"}, "uiComponent": "UISwitch"},
         {"function": "newWind", "identifier": "newWindPercentage", "title": "新风", "description": "", "type": "int", "specs": {"min": 1, "max": 100, "step": 1, "unit": "%"}, "uiComponent": "UISwitch"},

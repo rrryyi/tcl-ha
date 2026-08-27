@@ -55,9 +55,13 @@ LINK_RULES = [
             {"softWind": 0},
         ],
     },
-    {"main": ("windSpeedAutoSwitch", "==", 1), "when": [], "actions": [{"selfLearn": 0}]},
-    {"main": ("windSpeedPercentage", "==", "any"), "when": [], "actions": [{"selfLearn": 0}]},
-    {"main": ("windSpeedPercentage", "!=", 0), "when": [], "actions": [{"windSpeedAutoSwitch": 0}]},
+    # 风速与"风速自动"双向联动（与 App 面板一致，风速 0 即自动档）：
+    # 风速设 0 → 开自动；设非 0 → 关自动；关自动 → 风速落到最小档 1；开自动 → 风速归 0。
+    # 任何风速类操作都会取消自学习。
+    {"main": ("windSpeedAutoSwitch", "==", 0), "when": [], "actions": [{"windSpeedPercentage": 1}, {"selfLearn": 0}]},
+    {"main": ("windSpeedAutoSwitch", "==", 1), "when": [], "actions": [{"windSpeedPercentage": 0}, {"selfLearn": 0}]},
+    {"main": ("windSpeedPercentage", "==", 0), "when": [], "actions": [{"windSpeedAutoSwitch": 1}, {"selfLearn": 0}]},
+    {"main": ("windSpeedPercentage", "!=", 0), "when": [], "actions": [{"windSpeedAutoSwitch": 0}, {"selfLearn": 0}]},
     {"main": ("horizontalDirection", "==", "any"), "when": [], "actions": [{"selfLearn": 0}]},
     {"main": ("verticalDirection", "==", "any"), "when": [], "actions": [{"selfLearn": 0}]},
     {"main": ("sleep", "==", "any"), "when": [], "actions": [{"selfLearn": 0}]},

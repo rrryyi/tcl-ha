@@ -38,11 +38,16 @@ class TclSelect(TclAbstractEntity, SelectEntity):
 
     def select_option(self, option: str) -> None:
         #这里需要通过option反查key
-        key = get_key_by_value(self._attribute.ext.get('value_comparison_table'),option)
-        if key:
+        key = get_key_by_value(self._attribute.ext.get('value_comparison_table'), option)
+        # key 可能为合法的 0（如"关"、"自动"），不能用真值判断，否则该选项永远发不出去
+        if key is not None:
             self._send_command({
                 self._attribute.key: key
             })
+        else:
+            _LOGGER.warning('Device [{}] attribute [{}] option [{}] 反查 key 失败'.format(
+                self._device.id, self._attribute.key, option
+            ))
 
     def _get_value_from_comparison_table(self, value):
         value_comparison_table = self._attribute.ext.get('value_comparison_table', {})

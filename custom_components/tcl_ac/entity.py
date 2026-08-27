@@ -7,7 +7,7 @@ from homeassistant.helpers.entity import DeviceInfo, Entity
 
 from . import DOMAIN
 from .core.attribute import TclAttribute
-from .core.client import TclClient
+from .core.client import TclClient, TclClientException
 from .core.device import TclDevice
 from .core.event import EVENT_DEVICE_DATA_CHANGED, EVENT_GATEWAY_STATUS_CHANGED, EVENT_DEVICE_CONTROL
 from .core.event import listen_event, fire_event
@@ -113,8 +113,15 @@ class TclAbstractEntity(Entity, ABC):
         async def control_callback(e):
             #每个实体都会注册该事件，目前根据entityId进行判断防治多次操作
             if self.entity_id == e.data['entityId']:
-                # _LOGGER.warning('_send_command' + str(e.data['attributes']) + '_attr_name' + self._attr_name + 'entity_id' + self.entity_id)
-                await self._client.send_command(self._client.session, self._client.token, e.data['deviceId'], e.data['attributes'])
+                try:
+                    await self._client.send_command(
+                        self._client.session, self._client.token,
+                        e.data['deviceId'], e.data['attributes']
+                    )
+                except TclClientException as ex:
+                    _LOGGER.warning('entity [%s] 控制命令发送失败: %s (attributes=%s)',
+                                    self.entity_id, ex, e.data['attributes'])
+                    return
                 # 直接刷新属性状状
                 device_data = self._device.attribute_snapshot_data
                 for key, value in e.data['attributes'].items():

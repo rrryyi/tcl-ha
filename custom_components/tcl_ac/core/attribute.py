@@ -198,7 +198,6 @@ class V1SpecAttributeParser(TclAttributeParser, ABC):
             # 处理数值类型
             if 'int' in data_type or 'double' in data_type or 'float' in data_type:
                 specs = item['dataType']['specs']
-                data_opthons['device_class'] = "number"
                 data_opthons = {
                     'native_min_value': float(specs.get('min', 0)),
                     'native_max_value': float(specs.get('max', 100)),
@@ -244,7 +243,8 @@ class V1SpecAttributeParser(TclAttributeParser, ABC):
             optionslist.append(value)
 
         ext = {
-            'value_comparison_table': attribute['specs']
+            # 键统一转 str，与 select/sensor 读取时的 str(value) 查找保持一致
+            'value_comparison_table': value_comparison_table
         }
 
         options = {

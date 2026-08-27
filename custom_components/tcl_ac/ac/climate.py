@@ -227,15 +227,15 @@ class TclClimateEntity(TclAbstractEntity, ClimateEntity):
         await self.async_set_hvac_mode(HVACMode.OFF)
 
     async def async_set_fan_mode(self, fan_mode: str) -> None:
-        """设置风扇模式。自动风走 windSpeedAutoSwitch，手动档位下发风速百分比。"""
+        """设置风扇模式。自动风走 windSpeedAutoSwitch，手动档位下发风速百分比。
+        与风速自动/自学习的联动（风速 0 ↔ 自动）由 rules.linked_attributes 统一附带。"""
         if fan_mode == FAN_MODE_AUTO:
             self._send_command({"windSpeedAutoSwitch": 1})
             return
 
         target_speed = FAN_SPEED_MAP.get(fan_mode)
         if target_speed is not None:
-            # 手动设风速时联动关闭自动风（与 App 面板行为一致）
-            self._send_command({"windSpeedAutoSwitch": 0, "windSpeedPercentage": target_speed})
+            self._send_command({"windSpeedPercentage": target_speed})
         else:
             _LOGGER.warning(f"无法识别的风扇模式: {fan_mode}")
 
